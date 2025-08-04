@@ -1,0 +1,23 @@
+{
+    "name": "ouijaecho",
+    "version": "1.0.0",
+    "author": "Alejo Malia",
+    "license": "GPL-3.0-or-later",
+    "description": "A computational architecture to quantify Ouija board interactions and transform them into analyzable data.",
+    "main": "igenerator-ouijatext.js",
+    "type": "module",
+    "keywords": [
+        "ouija",
+        "ouija-board",
+        "coordinate-mapping",
+        "collision-detection",
+        "javascript",
+        "python",
+        "node",
+        "data-logging",
+        "session-logger",
+        "digital-framework",
+        "iot",
+        "data-science"
+      ]
+  }
