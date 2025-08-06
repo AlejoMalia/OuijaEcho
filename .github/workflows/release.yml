@@ -69,9 +69,10 @@ jobs:
       #########################################################################
       # BUILD
       #########################################################################
-
-      - name: 🏗 Build packages
-        run: pnpm build
+     
+     # Actually does not exist build command
+     # - name: 🏗 Build packages
+     #   run: pnpm build
 
       #########################################################################
       # EXIT IF IS PULL REQUEST
