@@ -1,5 +1,5 @@
 import { ouijaBoardMapping } from './ouijaBoardMapping.js';
-import readline from 'readline';
+import readline from 'node:readline';
 
 /**
  * Generates a list of coordinates for a given phrase based on the ouija board mapping.
