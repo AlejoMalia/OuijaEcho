@@ -8,13 +8,19 @@
 	},
     "license": "GPL-3.0-or-later",
     "description": "A computational architecture to quantify Ouija board interactions and transform them into analyzable data.",
-    "main": "src/igenerator-ouijatext.js",
-    "exports": {
-        ".": {
-
-        }
+    "bin": {
+        "ouijaecho":"src/bin.js"
     },
-    
+    "exports": {
+		".": {
+			"import": {
+				"default": "./src/index.js"
+			}
+		}
+    },
+    "files": [
+        "src"
+    ],
     "type": "module",
     "keywords": [
         "ouija",
@@ -31,7 +37,8 @@
         "data-science"
     ],
     "scripts": {
-        "update-version": "pnpx @changesets/cli version"
+        "dev": "node src/bin.js",
+        "update-version": "pnpx @changesets/cli"
     },
     "bugs": {
 		"url": "https://github.com/alejomalia/ouijaecho/issues",
