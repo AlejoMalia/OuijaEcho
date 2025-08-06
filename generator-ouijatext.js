@@ -53,7 +53,7 @@ function generatePhraseCoordinates(phrase) {
  * @param {Array<Object>} mappingData The data returned from generatePhraseCoordinates.
  */
 function displayMappingTable(mappingData) {
-  console.log('\nTabla con el resultado:');
+  console.log('\nTable with the result:');
   console.table(mappingData);
 }
 
