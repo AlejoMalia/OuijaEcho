@@ -2,7 +2,7 @@
 
 import { argv } from 'node:process'
 import readline from 'node:readline';
-import { startOuijaSession, displayMappingTable, ouijaBoardMapping } from './index.js'
+import { startOuijaSession, displayMappingTable, generatePhraseCoordinates } from './index.js'
 
 const args = argv.slice(2) 
 
