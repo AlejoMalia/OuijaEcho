@@ -1,13 +1,14 @@
 # OuijaEcho
+
 ![BANNER](/docs/banner.png)
 
 This repository provides a digital framework for **precise coordinate mapping of a classic Ouija board**. The primary goal is to standardize the board layout for use with *computer vision systems* and other *digital analysis tools*. This project details a `Cartesian coordinate system` with an origin at the top-left corner, assigning a center point `(Position X/Y)` and a radius `(Radius)` to each alphanumeric and command element. This open-source mapping can serve as a foundation for a wide range of applications, including data collection and objective analysis of planchette movements, making the study of the Ouija board more structured and replicable.
 
-### Session Logging & Pointer Position Detection
+## Session Logging & Pointer Position Detection
 
 This script `ouija_session.py/js` serves as a comprehensive engine for interpreting and recording an entire Ouija board session. Its purpose is to continuously translate real-time `Cartesian coordinates (X, Y)` into a chronological log of symbolic board elements (such as letters, numbers, or keywords). This moves beyond simple detection to capture the complete story of an interaction.
 
-#### How It Works
+### How It Works
 
 The code functions as a **session-based detection and logging engine**:
 
@@ -19,7 +20,7 @@ The code functions as a **session-based detection and logging engine**:
 
 This script is a powerful foundation for any application that needs to study behavioral patterns and interactions. It's ideal for a computer vision system tracking a physical pointer, or a virtual simulator logging user movements.
 
-### Ouija Board Coordinate Mapping
+## Ouija Board Coordinate Mapping
 
 ![BANNER](/docs/board.png)
 *Visual representation of the board's coordinate mapping. The circles indicate the position and detection radius for each letter, number, and command. The gray areas represent blocked or mute zones to prevent the system from recognizing them as significant.*
@@ -72,7 +73,31 @@ This section details the **Ouija Board Coordinate Mapping**, an essential compon
 | **Farewell Area** | `GOOD BYE` | `6.0 x 6.0` | `(18.5, 21.0)` | `3.0` |
 
 ---
-#### Contribute
+
+## Features
+
+- Supported environments: Browser, Node.js, Deno, and Bun.
+
+## Usage
+
+### Use as a node cli
+
+```bash
+npx ouijaecho
+```
+
+### Use as a lib
+
+```bash
+npm i ouijaecho
+```
+
+```js
+import ouijaecho from 'ouijaecho'
+
+// do something
+```
+## Contribute
 
 
 - [Report issues](https://github.com/your-username/CTHmodules/issues) - Share bugs or suggestions to refine the codebase.
@@ -81,6 +106,6 @@ This section details the **Ouija Board Coordinate Mapping**, an essential compon
 - [Support the project](https://github.com/sponsors/your-username) - Contribute financially to sustain development.
 - [Explore the code](https://github.com/your-username/CTHmodules/tree/main/src) - Dive into the source and collaborate on innovations.
 
-#### License
+## License
 This software is licensed with **[GPL-3.0](/LICENSE)**.
 ![License MIT](https://img.shields.io/badge/license-MIT-green.svg)

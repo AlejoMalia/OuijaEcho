@@ -2,21 +2,21 @@
     "name": "ouijaecho",
     "version": "1.0.0",
     "author": {
-		"name": "Alejo Malia",
-		"email": "alejo@pigeonposse.com",
-		"url": "https://github.com/alejomalia"
-	},
+        "name": "Alejo Malia",
+        "email": "alejo@pigeonposse.com",
+        "url": "https://github.com/alejomalia"
+    },
     "license": "GPL-3.0-or-later",
     "description": "A computational architecture to quantify Ouija board interactions and transform them into analyzable data.",
     "bin": {
-        "ouijaecho":"src/bin.js"
+        "ouijaecho": "src/bin.js"
     },
     "exports": {
-		".": {
-			"import": {
-				"default": "./src/index.js"
-			}
-		}
+        ".": {
+            "import": {
+                "default": "./src/index.js"
+            }
+        }
     },
     "files": [
         "src"
@@ -41,21 +41,21 @@
         "update-version": "pnpx @changesets/cli"
     },
     "bugs": {
-		"url": "https://github.com/alejomalia/ouijaecho/issues",
-		"email": "alejo@pigeonposse.com"
-	},
+        "url": "https://github.com/alejomalia/ouijaecho/issues",
+        "email": "alejo@pigeonposse.com"
+    },
     "homepage": "https://github.com/alejomalia/ouijaecho",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/alejomalia/ouijaecho"
-	},
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/alejomalia/ouijaecho"
+    },
     "packageManager": "pnpm@10.14.0",
     "devDependencies": {
         "@changesets/changelog-github": "^0.5.1",
         "@types/node": "^24.2.0"
     },
     "publishConfig": {
-		"access": "public",
-		"registry": "https://registry.npmjs.org/"
-	}
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    }
 }
