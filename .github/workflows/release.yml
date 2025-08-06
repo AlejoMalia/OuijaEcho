@@ -5,9 +5,6 @@
 name: ✅ Tests and check for updates
 
 on:
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
@@ -70,8 +67,9 @@ jobs:
       # BUILD
       #########################################################################
 
-      - name: 🏗 Build packages
-        run: pnpm build
+     # Actually does not exist build command
+     # - name: 🏗 Build packages
+     #   run: pnpm build
 
       #########################################################################
       # EXIT IF IS PULL REQUEST
