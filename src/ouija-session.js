@@ -1,5 +1,5 @@
 // Import the mapping data
-import { ouijaBoardMapping } from './ouijaBoardMapping.js';
+import { ouijaBoardMapping } from './ouija-board-mapping.js';
 
 function getDistance(pos1, pos2) {
     const dx = pos1.x - pos2.x;
@@ -7,7 +7,28 @@ function getDistance(pos1, pos2) {
     return Math.sqrt(dx * dx + dy * dy);
 }
 
-function startOuijaSession(getCoordsFunc) {
+/**
+ * Starts a Ouija board session that tracks the given coordinates and logs detected elements.
+ *
+ * The function continuously checks every 100ms whether the current position (x, y)
+ * falls within the area of a letter, number, or special element (affirmation, negation, farewell).
+ * If a new element is detected (i.e., different from the last one), it is added to the session log.
+ *
+ * @param {{ x: number, y: number }} cords - An object containing the x and y coordinates to be checked.
+ *
+ * @returns {() => Array<{ element: string, timestamp: string, position: { x: number, y: number } }>}
+ * A function that stops the session when called and returns the complete session log.
+ *
+ * @example
+ * const cords = { x: 10, y: 5 };
+ * const stop = startOuijaSession(cords);
+ * setTimeout(() => {
+ *   const log = stop();
+ *   console.log(log);
+ * }, 2000);
+ */
+export function startOuijaSession(cords) {
+
     let sessionLog = [];
     let lastDetectedElement = null;
     let intervalId = null;
@@ -15,7 +36,7 @@ function startOuijaSession(getCoordsFunc) {
     console.log("--- Ouija Session Started ---");
     
     intervalId = setInterval(() => {
-        const { x, y } = getCoordsFunc();
+        const { x, y } = cords;
         const currentPos = { x, y };
         let detectedElement = "Mute Zone";
 
@@ -65,27 +86,3 @@ function startOuijaSession(getCoordsFunc) {
         return sessionLog;
     };
 }
-
-// --- Example of a function that provides coordinates ---
-let simulationIndex = 0;
-const coordinatesSimulationData = [
-    { x: 8.0, y: 3.5 }, { x: 8.1, y: 3.6 }, { x: 8.2, y: 3.7 },
-    { x: 12.0, y: 6.0 }, { x: 12.1, y: 6.1 },
-    { x: 15.0, y: 16.5 },
-    { x: 29.0, y: 3.5 },
-    { x: 1.0, y: 1.0 }
-];
-function getSimulatedCoords() {
-    if (simulationIndex < coordinatesSimulationData.length) {
-        return coordinatesSimulationData[simulationIndex++];
-    }
-    return { x: 1, y: 1 };
-}
-
-// --- Run the session and stop it after a few seconds ---
-const stopSession = startOuijaSession(getSimulatedCoords);
-setTimeout(() => {
-    const sessionResults = stopSession();
-    console.log("\nFinal Session Log:");
-    console.log(sessionResults);
-}, 2000);
