@@ -1,0 +1,107 @@
+###############################################################################
+# RELEASE
+###############################################################################
+
+name: ✅ Tests and check for updates
+
+on:
+  workflow_dispatch:
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+env:
+  GITHUB_TOKEN: ${{ github.token }}
+  NPM_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+permissions:
+  contents: write # to create release (changesets/action)
+  pull-requests: write # to create pull request (changesets/action)
+  issues: write # to post issue comments (changesets/action
+  id-token: write # to use OpenID Connect token for provenance (changesets/action)
+  actions: write # to create workflow dispatches 
+
+###############################################################################
+# JOBS
+###############################################################################
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+
+      #########################################################################
+      # INIT
+      #########################################################################
+
+      - name: ⬇️🛑 Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.12.1
+      - name: ⬇️🛎 Checkout
+        uses: actions/checkout@v4
+      - name: ⬇️🥡 Install pnpm
+        uses: pnpm/action-setup@v4
+      - name: ⬇️🟢 Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: 'pnpm'
+
+      - name: 🐙😺 Check GitHub API Rate Limit
+        id: rate_limit
+        run: |
+          response=$(gh api rate_limit)
+          limit=$(echo $response | jq -r '.resources.core.limit')
+          remaining=$(echo $response | jq -r '.resources.core.remaining')
+          echo "GitHub API Rate Limit: $remaining/$limit"
+
+          if [ "$remaining" -lt 10 ]; then
+              exit 1
+          fi
+        env:
+            GH_TOKEN: ${{ env.GITHUB_TOKEN }}
+
+      - name: ⬇️📦 Install dependencies
+        run: |
+           export npm_config_build_from_source=false
+           pnpm install --no-frozen-lockfile --ignore-scripts
+
+      #########################################################################
+      # BUILD
+      #########################################################################
+
+     # Actually does not exist build command
+     # - name: 🏗 Build packages
+     #   run: pnpm build
+
+      #########################################################################
+      # EXIT IF IS PULL REQUEST
+      #########################################################################
+
+      - name: 🚪 Exit here if is pull request
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "Pull request detected, exiting..."
+          exit 0
+        env:
+          GITHUB_TOKEN: ${{env.GITHUB_TOKEN }}
+
+      #########################################################################
+      #########################################################################
+      # UPDATE VERSIONS
+      #########################################################################
+      #########################################################################
+
+      - name: 📣 Create Release Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          title: "chore(release): version packages 🦋"
+          version: pnpx @changesets/cli version --silent
+          publish: pnpx @changesets/cli publish --silent
+          commit: "chore(release): version packages 🦋 [skip ci]"
+          createGithubReleases: true
+        env:
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ env.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
+
+
+###############################################################################

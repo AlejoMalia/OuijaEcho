@@ -1,0 +1,42 @@
+OUIJAECHO NON-COMMERCIAL SCIENTIFIC & ACADEMIC RESEARCH LICENSE
+Version 1.0 (September 2026)
+
+Copyright (c) 2026 Alejo Malia <alejo@pigeonposse.com> (https://github.com/alejomalia)
+
+Permission is hereby granted, free of charge, to any person or institution obtaining a copy
+of this software, source code, coordinate mappings, documentation, and associated analytical
+modules (the "Software"), to inspect, run, modify, and distribute the Software, strictly
+subject to the following conditions:
+
+1. SCIENTIFIC, ACADEMIC & EDUCATIONAL USE ONLY:
+   The Software is dedicated exclusively to non-commercial scientific research, experimental
+   psychology, cognitive neuroscience, motor control biomechanics, educational instruction,
+   and open-science experimental investigations.
+
+2. NON-COMMERCIAL RESTRICTION:
+   Any commercial use, exploitation, monetized deployment, sale, sublicensing, or incorporation
+   of the Software (or its derived models, coordinate mappings, and algorithms) into proprietary,
+   commercial, or revenue-generating products, services, or platforms is STRICTLY PROHIBITED
+   without prior, explicit, written permission from the copyright holder.
+
+3. MANDATORY ATTRIBUTION & CITATION:
+   Any academic publication, preprint, journal article, conference proceeding, book, thesis,
+   or public research presentation that makes use of the Software, its coordinate datasets,
+   kinematic engine, or ambient cross-correlation algorithms must conspicuously include the
+   following citation:
+
+   Malia, A. (2026). OuijaEcho: A Computational Framework for Ideomotor Kinematics,
+   Continuous Spatial Attraction, and Multimodal Ambient Intelligence.
+   GitHub repository: https://github.com/alejomalia/ouijaecho
+
+4. NOTICE RETENTION:
+   The above copyright notice, this permission notice, and the academic citation notice
+   shall be retained intact in all copies, substantial portions, or modified forks of the Software.
+
+5. DISCLAIMER OF WARRANTY & LIMITATION OF LIABILITY:
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+   PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHOR OR COPYRIGHT HOLDERS BE LIABLE
+   FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR
+   OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+   DEALINGS IN THE SOFTWARE.

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OuijaEcho Scientific Session Visualizer</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.2);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --success: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 24px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    header { margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+    h1 { font-size: 1.8rem; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+    .subtitle { color: var(--text-muted); font-size: 0.95rem; margin-top: 4px; }
+    .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: var(--accent); }
+    .svg-container { width: 100%; border-radius: 8px; background: #020617; border: 1px solid var(--border); overflow: hidden; }
+    svg { width: 100%; height: auto; display: block; }
+    .board-bg { fill: #090d16; stroke: #1e293b; stroke-width: 0.2; }
+    .board-target { fill: #1e293b; stroke: #475569; stroke-width: 0.15; opacity: 0.8; }
+    .target-cmd { fill: #1e1b4b; stroke: #6366f1; }
+    .board-label { fill: #cbd5e1; font-size: 0.9px; text-anchor: middle; font-weight: bold; pointer-events: none; }
+    .trajectory-path { fill: none; stroke: var(--accent); stroke-width: 0.25; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 1px var(--accent)); }
+    .dwell-marker { fill: rgba(245, 158, 11, 0.4); stroke: #f59e0b; stroke-width: 0.1; }
+    .metric-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .metric-box { background: #0f172a; border-radius: 8px; padding: 12px; border: 1px solid var(--border); }
+    .metric-val { font-size: 1.3rem; font-weight: 700; color: var(--text); }
+    .metric-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; }
+    .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+    .badge-pristine { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+    .badge-disturbed { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+    .table-container { margin-top: 16px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    th { color: var(--text-muted); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🧿 OuijaEcho Scientific Session Visualizer</h1>
+      <p class="subtitle">Computational Ideomotor Kinematics & Ambient Disturbance Synthesis</p>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-title">Planchette Trajectory & Spatial Attraction Basins</div>
+        <div class="svg-container">
+          <svg viewBox="0 0 37 24" preserveAspectRatio="xMidYMid meet">
+            <rect x="0" y="0" width="37" height="24" class="board-bg" />
+            <circle cx="8" cy="3.5" r="2.5" class="board-target target-cmd" />
+<text x="8" y="3.9" class="board-label">YES</text>
+<circle cx="29" cy="3.5" r="2.5" class="board-target target-cmd" />
+<text x="29" y="3.9" class="board-label">NO</text>
+<circle cx="4.5" cy="7.5" r="1.5" class="board-target target-letter" />
+<text x="4.5" y="7.9" class="board-label">A</text>
+<circle cx="7" cy="7" r="1.5" class="board-target target-letter" />
+<text x="7" y="7.4" class="board-label">B</text>
+<circle cx="9.5" cy="6.5" r="1.5" class="board-target target-letter" />
+<text x="9.5" y="6.9" class="board-label">C</text>
+<circle cx="12" cy="6" r="1.5" class="board-target target-letter" />
+<text x="12" y="6.4" class="board-label">D</text>
+<circle cx="14.5" cy="5.5" r="1.5" class="board-target target-letter" />
+<text x="14.5" y="5.9" class="board-label">E</text>
+<circle cx="17.5" cy="5" r="1.5" class="board-target target-letter" />
+<text x="17.5" y="5.4" class="board-label">F</text>
+<circle cx="20" cy="5" r="1.5" class="board-target target-letter" />
+<text x="20" y="5.4" class="board-label">G</text>
+<circle cx="22.5" cy="5.5" r="1.5" class="board-target target-letter" />
+<text x="22.5" y="5.9" class="board-label">H</text>
+<circle cx="25" cy="6" r="1.5" class="board-target target-letter" />
+<text x="25" y="6.4" class="board-label">I</text>
+<circle cx="27.5" cy="6.5" r="1.5" class="board-target target-letter" />
+<text x="27.5" y="6.9" class="board-label">J</text>
+<circle cx="30" cy="7" r="1.5" class="board-target target-letter" />
+<text x="30" y="7.4" class="board-label">K</text>
+<circle cx="32.5" cy="7.5" r="1.5" class="board-target target-letter" />
+<text x="32.5" y="7.9" class="board-label">L</text>
+<circle cx="35" cy="8" r="1.5" class="board-target target-letter" />
+<text x="35" y="8.4" class="board-label">M</text>
+<circle cx="5" cy="11.5" r="1.5" class="board-target target-letter" />
+<text x="5" y="11.9" class="board-label">N</text>
+<circle cx="7.5" cy="11" r="1.5" class="board-target target-letter" />
+<text x="7.5" y="11.4" class="board-label">O</text>
+<circle cx="10" cy="10.5" r="1.5" class="board-target target-letter" />
+<text x="10" y="10.9" class="board-label">P</text>
+<circle cx="12.5" cy="10" r="1.5" class="board-target target-letter" />
+<text x="12.5" y="10.4" class="board-label">Q</text>
+<circle cx="15.5" cy="9.5" r="1.5" class="board-target target-letter" />
+<text x="15.5" y="9.9" class="board-label">R</text>
+<circle cx="18" cy="9.5" r="1.5" class="board-target target-letter" />
+<text x="18" y="9.9" class="board-label">S</text>
+<circle cx="20.5" cy="9.5" r="1.5" class="board-target target-letter" />
+<text x="20.5" y="9.9" class="board-label">T</text>
+<circle cx="23" cy="9.5" r="1.5" class="board-target target-letter" />
+<text x="23" y="9.9" class="board-label">U</text>
+<circle cx="25.5" cy="10" r="1.5" class="board-target target-letter" />
+<text x="25.5" y="10.4" class="board-label">V</text>
+<circle cx="28" cy="10.5" r="1.5" class="board-target target-letter" />
+<text x="28" y="10.9" class="board-label">W</text>
+<circle cx="30.5" cy="11" r="1.5" class="board-target target-letter" />
+<text x="30.5" y="11.4" class="board-label">X</text>
+<circle cx="33" cy="11.5" r="1.5" class="board-target target-letter" />
+<text x="33" y="11.9" class="board-label">Y</text>
+<circle cx="35.5" cy="12" r="1.5" class="board-target target-letter" />
+<text x="35.5" y="12.4" class="board-label">Z</text>
+<circle cx="6" cy="16.5" r="1.5" class="board-target target-number" />
+<text x="6" y="16.9" class="board-label">1</text>
+<circle cx="9" cy="16.5" r="1.5" class="board-target target-number" />
+<text x="9" y="16.9" class="board-label">2</text>
+<circle cx="12" cy="16.5" r="1.5" class="board-target target-number" />
+<text x="12" y="16.9" class="board-label">3</text>
+<circle cx="15" cy="16.5" r="1.5" class="board-target target-number" />
+<text x="15" y="16.9" class="board-label">4</text>
+<circle cx="18" cy="16.5" r="1.5" class="board-target target-number" />
+<text x="18" y="16.9" class="board-label">5</text>
+<circle cx="21" cy="16.5" r="1.5" class="board-target target-number" />
+<text x="21" y="16.9" class="board-label">6</text>
+<circle cx="24" cy="16.5" r="1.5" class="board-target target-number" />
+<text x="24" y="16.9" class="board-label">7</text>
+<circle cx="27" cy="16.5" r="1.5" class="board-target target-number" />
+<text x="27" y="16.9" class="board-label">8</text>
+<circle cx="30" cy="16.5" r="1.5" class="board-target target-number" />
+<text x="30" y="16.9" class="board-label">9</text>
+<circle cx="33" cy="16.5" r="1.5" class="board-target target-number" />
+<text x="33" y="16.9" class="board-label">0</text>
+<circle cx="18.5" cy="21" r="3" class="board-target target-cmd" />
+<text x="18.5" y="21.5" class="board-label">GOOD BYE</text>
+            <polyline points="8.01,3.47 8.08,3.61 9.97,4.77 12,5.98 12.08,6.02 13.53,11.19 15.04,16.5 22.02,9.97 29.02,3.46 0.97,0.99 1.03,0.98 0.98,0.98 1.03,1.03 0.96,0.98 1.02,1.01 0.98,0.97 0.99,1.03 0.99,1.04 1.01,1.02 0.99,1.02 1,0.99 0.96,1.01 0.99,1 0.99,1.02 1,1.03 1.02,1.03 1.02,1.02 0.99,0.97 1.02,0.99 0.98,1.02 1,0.97 0.99,1.03 1,0.99 0.99,0.97 0.97,0.97 1,0.98 1.02,1.02 1.03,1.03 0.98,1.03 1.01,1.03 1.03,0.98 1.02,1.01 1,0.98 1,1.01 1.03,1.04 1.01,0.99 1.02,0.97 0.99,0.98" class="trajectory-path" />
+            
+          </svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Scientific Telemetry & Ambient Score</div>
+        <div class="metric-grid">
+          <div class="metric-box">
+            <div class="metric-val">8.658</div>
+            <div class="metric-label">Tortuosity Index</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">7.899</div>
+            <div class="metric-label">Log Norm. Jerk</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">29.59 cm/s</div>
+            <div class="metric-label">Mean Velocity</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">0.787</div>
+            <div class="metric-label">Isolation Score</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px;">
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Purity Assessment:</div>
+          <span class="badge badge-disturbed">
+            LIGHTLY_PERTURBED
+          </span>
+        </div>
+
+        <div style="margin-top: 16px;">
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Detected Sequence:</div>
+          <div style="font-size: 1.1rem; font-weight: bold; color: var(--accent);">
+            None
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Target Dwells & Environmental Event Correlation</div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Target</th>
+              <th>Dwell Duration</th>
+              <th>Max Probability</th>
+              <th>Coincident Ambient Spikes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No dwell events recorded</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OuijaEcho Multimodal Research Laboratory</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #131c2e;
+      --accent: #38bdf8;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #1e293b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 20px; }
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 20px; }
+    h1 { font-size: 1.6rem; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+    .badge { padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: bold; background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid var(--accent); }
+    .layout { display: grid; grid-template-columns: 2.2fr 1fr; gap: 20px; }
+    @media (max-width: 960px) { .layout { grid-template-columns: 1fr; } }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+    .card-title { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .board-container { width: 100%; background: #020617; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; position: relative; cursor: crosshair; }
+    svg { width: 100%; height: auto; display: block; }
+    .board-bg { fill: #070b12; }
+    .target-circle { fill: #1e293b; stroke: #334155; stroke-width: 0.15; opacity: 0.85; transition: fill 0.1s; }
+    .target-circle.active { fill: rgba(56, 189, 248, 0.4); stroke: var(--accent); stroke-width: 0.3; }
+    .target-text { fill: #cbd5e1; font-size: 0.9px; text-anchor: middle; font-weight: bold; pointer-events: none; }
+    .planchette { fill: rgba(245, 158, 11, 0.7); stroke: #f59e0b; stroke-width: 0.25; filter: drop-shadow(0 0 2px #f59e0b); }
+    .trail { fill: none; stroke: var(--accent); stroke-width: 0.2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.7; }
+    .modality-toggles { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .btn-toggle { background: #0f172a; border: 1px solid var(--border); color: var(--text-muted); padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .btn-toggle.active { background: rgba(56, 189, 248, 0.15); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+    .telemetry-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+    .meter-box { background: #0b1120; border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+    .meter-val { font-size: 1.3rem; font-weight: bold; color: var(--text); }
+    .meter-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; }
+    .actions { display: flex; gap: 8px; margin-top: 14px; }
+    .btn { padding: 10px 14px; border-radius: 6px; border: none; font-weight: 600; font-size: 0.85rem; cursor: pointer; flex: 1; text-align: center; text-decoration: none; display: inline-flex; justify-content: center; align-items: center; }
+    .btn-primary { background: var(--accent); color: #020617; }
+    .btn-secondary { background: #1e293b; color: var(--text); border: 1px solid var(--border); }
+    .log-terminal { background: #020617; border: 1px solid var(--border); border-radius: 6px; padding: 10px; font-family: monospace; font-size: 0.75rem; color: #a5f3fc; height: 130px; overflow-y: auto; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>🧿 OuijaEcho Multimodal Research Suite</h1>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Universal Ideomotor Kinematics & Ambient Telemetry Lab</p>
+    </div>
+    <span class="badge" id="connStatus">● Engine Ready</span>
+  </div>
+
+  <div class="modality-toggles">
+    <button class="btn-toggle active" id="btnPointer">🖱️ Mouse / Touch Mode</button>
+    <button class="btn-toggle" id="btnAudio">🎙️ Ambient Mic</button>
+    <button class="btn-toggle" id="btnCamera">📷 Webcam Homography</button>
+    <button class="btn-toggle" id="btnLinguistic">📖 Linguistic Prior</button>
+    <button class="btn-toggle" id="btnVectorField">🧭 Vector Field (∇U)</button>
+    <button class="btn-toggle" id="btnAutonomous">⚛️ Autonomous Langevin Particle</button>
+  </div>
+
+  <div class="layout">
+    <div class="card">
+      <div class="card-title">
+        <span>Cartesian Metric Space (37.0 × 24.0 cm)</span>
+        <span style="font-size: 0.8rem; color: var(--text-muted);" id="coordDisplay">X: 18.5 cm | Y: 12.0 cm</span>
+      </div>
+
+      <div class="board-container" id="boardWrapper">
+        <svg viewBox="0 0 37 24" id="boardSvg">
+          <rect x="0" y="0" width="37" height="24" class="board-bg" />
+          <g id="vectorFieldGroup"></g>
+          <g id="targetsGroup"></g>
+          <polyline points="" class="trail" id="trailLine" />
+          <circle cx="18.5" cy="12.0" r="1.2" class="planchette" id="planchetteCircle" />
+        </svg>
+      </div>
+
+      <div class="log-terminal" id="logConsole">
+        <div>[System] OuijaEcho Universal Architecture initialized.</div>
+        <div>[Guide] Click and drag on the board to move the planchette.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Live Scientific Telemetry</div>
+      
+      <div class="telemetry-grid">
+        <div class="meter-box">
+          <div class="meter-val" id="valSpeed">0.0</div>
+          <div class="meter-label">Velocity (cm/s)</div>
+        </div>
+        <div class="meter-box">
+          <div class="meter-val" id="valJerk">0.0</div>
+          <div class="meter-label">Jerk (cm/s³)</div>
+        </div>
+        <div class="meter-box">
+          <div class="meter-val" id="valNoise">35.0</div>
+          <div class="meter-label">Sound Level (dB)</div>
+        </div>
+        <div class="meter-box">
+          <div class="meter-val" id="valTarget">-</div>
+          <div class="meter-label">Nearest Target</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">Top Linguistic Candidate:</div>
+        <div style="font-size: 1.1rem; font-weight: bold; color: var(--accent);" id="linguisticCandidate">Awaiting input...</div>
+      </div>
+
+      <div style="margin-top: 14px; margin-bottom: 10px;">
+        <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px; display: flex; justify-content: space-between;">
+          <span>Kinematic Waveform</span>
+          <span><span style="color: var(--accent);">— Velocity</span> | <span style="color: var(--warning);">— Jerk</span></span>
+        </div>
+        <canvas id="waveCanvas" width="320" height="75" style="width: 100%; height: 75px; background: #020617; border-radius: 6px; border: 1px solid var(--border); display: block;"></canvas>
+      </div>
+
+      <div class="telemetry-grid" style="margin-bottom: 12px;">
+        <div class="meter-box">
+          <div class="meter-val" id="valISI">0 ms</div>
+          <div class="meter-label">Flight Time (ISI)</div>
+        </div>
+        <div class="meter-box">
+          <div class="meter-val" id="valDwells">0</div>
+          <div class="meter-label">Dwell Fixations</div>
+        </div>
+      </div>
+
+      <div class="actions" style="flex-direction: column; gap: 6px;">
+        <div style="display: flex; gap: 6px;">
+          <button class="btn btn-secondary" id="btnSimulate">⚡ Inject Shock</button>
+          <button class="btn btn-primary" id="btnExport">💾 Time-Series CSV</button>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn btn-secondary" id="btnExportTransitions" style="font-size: 0.78rem;">🛫 Transitions CSV</button>
+          <button class="btn btn-secondary" id="btnExportHtml" style="font-size: 0.78rem;">📄 HTML Report</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { ouijaBoardMapping } from '/src/ouija-board-mapping.js';
+    import { getAllBoardTargets, findNearestElement } from '/src/core/geometry.js';
+    import { PointerAdapter } from '/src/inputs/pointer-adapter.js';
+    import { LinguisticPrior } from '/src/analytics/linguistic-prior.js';
+    import { PotentialLandscape } from '/src/streaming/potential-landscape.js';
+
+    // State
+    const pointer = new PointerAdapter();
+    const linguistic = new LinguisticPrior();
+    const landscape = new PotentialLandscape();
+    const trailPoints = [];
+    let isMouseDown = false;
+    let micStream = null;
+    let audioContext = null;
+    let audioMeter = 35.0;
+    let detectedSequence = '';
+    let vectorFieldVisible = false;
+    let autonomousMode = false;
+    let autonomousTimer = null;
+    let particle = { x: 18.5, y: 12.0, vx: 0, vy: 0 };
+
+    // Render Board Targets
+    const targetsGroup = document.getElementById('targetsGroup');
+    const targets = getAllBoardTargets();
+    for (const t of targets) {
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', t.position.x);
+      circle.setAttribute('cy', t.position.y);
+      circle.setAttribute('r', t.radius);
+      circle.setAttribute('class', 'target-circle');
+      circle.setAttribute('id', 'target-' + t.id);
+      targetsGroup.appendChild(circle);
+
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', t.position.x);
+      text.setAttribute('y', t.position.y + 0.35);
+      text.setAttribute('class', 'target-text');
+      text.textContent = t.name;
+      targetsGroup.appendChild(text);
+    }
+
+    // Pointer Interaction
+    const boardWrapper = document.getElementById('boardWrapper');
+    const planchette = document.getElementById('planchetteCircle');
+    const trailLine = document.getElementById('trailLine');
+    const logConsole = document.getElementById('logConsole');
+
+    function log(msg) {
+      const line = document.createElement('div');
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      logConsole.appendChild(line);
+      logConsole.scrollTop = logConsole.scrollHeight;
+    }
+
+    // Real-Time Oscilloscope Waveform
+    const waveCanvas = document.getElementById('waveCanvas');
+    const waveCtx = waveCanvas.getContext('2d');
+    const waveBuffer = [];
+    const maxWavePoints = 80;
+
+    function pushWaveSample(speed, jerk) {
+      waveBuffer.push({ speed, jerk });
+      if (waveBuffer.length > maxWavePoints) waveBuffer.shift();
+      drawWaveform();
+    }
+
+    function drawWaveform() {
+      const w = waveCanvas.width;
+      const h = waveCanvas.height;
+      waveCtx.clearRect(0, 0, w, h);
+
+      // Grid
+      waveCtx.strokeStyle = '#0f172a';
+      waveCtx.lineWidth = 1;
+      waveCtx.beginPath();
+      waveCtx.moveTo(0, h / 2); waveCtx.lineTo(w, h / 2);
+      waveCtx.stroke();
+
+      if (waveBuffer.length < 2) return;
+
+      const step = w / (maxWavePoints - 1);
+
+      // Draw Speed (cyan)
+      waveCtx.strokeStyle = '#38bdf8';
+      waveCtx.lineWidth = 1.8;
+      waveCtx.beginPath();
+      for (let i = 0; i < waveBuffer.length; i++) {
+        const x = i * step;
+        const normSpeed = Math.min(1, waveBuffer[i].speed / 40);
+        const y = h - (normSpeed * (h - 8)) - 4;
+        if (i === 0) waveCtx.moveTo(x, y);
+        else waveCtx.lineTo(x, y);
+      }
+      waveCtx.stroke();
+
+      // Draw Jerk (amber/orange)
+      waveCtx.strokeStyle = '#f59e0b';
+      waveCtx.lineWidth = 1.5;
+      waveCtx.beginPath();
+      for (let i = 0; i < waveBuffer.length; i++) {
+        const x = i * step;
+        const normJerk = Math.min(1, Math.log10(Math.max(1, waveBuffer[i].jerk)) / 4);
+        const y = h - (normJerk * (h - 8)) - 4;
+        if (i === 0) waveCtx.moveTo(x, y);
+        else waveCtx.lineTo(x, y);
+      }
+      waveCtx.stroke();
+    }
+
+    // High-performance rAF feed dispatcher
+    let pendingCoords = null;
+    let isFeedBusy = false;
+
+    function dispatchFeed(coords) {
+      pendingCoords = coords;
+      if (isFeedBusy) return;
+      isFeedBusy = true;
+
+      requestAnimationFrame(async () => {
+        if (!pendingCoords) { isFeedBusy = false; return; }
+        const payloadCoords = pendingCoords;
+        pendingCoords = null;
+
+        try {
+          const r = await fetch('/api/feed', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ coords: payloadCoords, ambient: { noiseDb: audioMeter } })
+          });
+          const data = await r.json();
+          if (data.frame && data.frame.kinematic) {
+            const k = data.frame.kinematic;
+            document.getElementById('valSpeed').textContent = k.speed.toFixed(1);
+            document.getElementById('valJerk').textContent = k.jerk.toFixed(1);
+            pushWaveSample(k.speed, k.jerk);
+          }
+        } catch (err) {}
+
+        isFeedBusy = false;
+        if (pendingCoords) dispatchFeed(pendingCoords);
+      });
+    }
+
+    function handleMove(e) {
+      const rect = boardWrapper.getBoundingClientRect();
+      pointer.setViewport(rect.width, rect.height);
+      const coords = pointer.handlePointer(e.clientX - rect.left, e.clientY - rect.top);
+
+      planchette.setAttribute('cx', coords.x);
+      planchette.setAttribute('cy', coords.y);
+      document.getElementById('coordDisplay').textContent = `X: ${coords.x} cm | Y: ${coords.y} cm`;
+
+      trailPoints.push(`${coords.x},${coords.y}`);
+      if (trailPoints.length > 50) trailPoints.shift();
+      trailLine.setAttribute('points', trailPoints.join(' '));
+
+      // Target Detection
+      const nearest = findNearestElement(coords);
+      if (nearest.isInsideRadius) {
+        document.getElementById('valTarget').textContent = nearest.target.name;
+        if (!detectedSequence.endsWith(nearest.target.name)) {
+          detectedSequence += nearest.target.name;
+          log(`Target entered: ${nearest.target.name}`);
+          updateLinguistic();
+        }
+      } else {
+        document.getElementById('valTarget').textContent = 'Transit';
+      }
+
+      // Throttled high-performance stream
+      dispatchFeed(coords);
+    }
+
+    boardWrapper.addEventListener('mousedown', (e) => { isMouseDown = true; handleMove(e); });
+    window.addEventListener('mouseup', () => { isMouseDown = false; });
+    boardWrapper.addEventListener('mousemove', (e) => { if (isMouseDown) handleMove(e); });
+
+    // Periodic telemetry status sync (every 1s)
+    setInterval(async () => {
+      try {
+        const res = await fetch('/api/status');
+        const s = await res.json();
+        document.getElementById('valDwells').textContent = s.dwells || 0;
+        if (s.transitions > 0) {
+          document.getElementById('valISI').textContent = `${s.transitions} trans`;
+        }
+      } catch (e) {}
+    }, 1000);
+
+    // Linguistic Prior Prediction
+    function updateLinguistic() {
+      if (detectedSequence.length > 0) {
+        const cands = linguistic.predictNextCandidates(detectedSequence, 2);
+        if (cands.length > 0) {
+          document.getElementById('linguisticCandidate').textContent = `${cands[0].letter} (${(cands[0].probability * 100).toFixed(0)}%)`;
+        }
+      }
+    }
+
+    // Audio Web API
+    document.getElementById('btnAudio').addEventListener('click', async () => {
+      const btn = document.getElementById('btnAudio');
+      if (!micStream) {
+        try {
+          micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const source = audioContext.createMediaStreamSource(micStream);
+          const analyser = audioContext.createAnalyser();
+          source.connect(analyser);
+
+          const pcm = new Uint8Array(analyser.frequencyBinCount);
+          setInterval(() => {
+            analyser.getByteFrequencyData(pcm);
+            let sum = 0;
+            for (let i = 0; i < pcm.length; i++) sum += pcm[i];
+            const avg = sum / pcm.length;
+            audioMeter = Number((35 + (avg / 2)).toFixed(1));
+            document.getElementById('valNoise').textContent = audioMeter;
+          }, 150);
+
+          btn.classList.add('active');
+          log('Microphone ambient channel connected.');
+        } catch (err) {
+          log('Microphone access denied: ' + err.message);
+        }
+      } else {
+        micStream.getTracks().forEach(t => t.stop());
+        micStream = null;
+        btn.classList.remove('active');
+        log('Microphone disconnected.');
+      }
+    });
+
+    // Vector Field Toggle
+    document.getElementById('btnVectorField').addEventListener('click', () => {
+      const btn = document.getElementById('btnVectorField');
+      const group = document.getElementById('vectorFieldGroup');
+      vectorFieldVisible = !vectorFieldVisible;
+      btn.classList.toggle('active', vectorFieldVisible);
+
+      if (vectorFieldVisible) {
+        group.innerHTML = '';
+        const field = landscape.generateVectorField(20, 13);
+        for (const pt of field) {
+          if (pt.fx === 0 && pt.fy === 0) continue;
+          const mag = Math.sqrt(pt.fx * pt.fx + pt.fy * pt.fy);
+          if (mag < 0.2) continue;
+          const len = Math.min(1.2, mag * 0.4);
+          const x2 = pt.x + (pt.fx / mag) * len;
+          const y2 = pt.y + (pt.fy / mag) * len;
+
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', pt.x);
+          line.setAttribute('y1', pt.y);
+          line.setAttribute('x2', x2);
+          line.setAttribute('y2', y2);
+          line.setAttribute('stroke', 'rgba(56, 189, 248, 0.35)');
+          line.setAttribute('stroke-width', '0.08');
+          group.appendChild(line);
+        }
+        log('Potential energy vector field (∇U) rendered.');
+      } else {
+        group.innerHTML = '';
+      }
+    });
+
+    // Autonomous Langevin Mode
+    document.getElementById('btnAutonomous').addEventListener('click', () => {
+      const btn = document.getElementById('btnAutonomous');
+      autonomousMode = !autonomousMode;
+      btn.classList.toggle('active', autonomousMode);
+
+      if (autonomousMode) {
+        log('⚛️ Autonomous Langevin Particle mode started (Stochastic Resonance).');
+        autonomousTimer = setInterval(() => {
+          particle = landscape.step(particle, 0.02, { noiseMagnitude: 0.4 });
+          planchette.setAttribute('cx', particle.x);
+          planchette.setAttribute('cy', particle.y);
+          document.getElementById('coordDisplay').textContent = `X: ${particle.x} cm | Y: ${particle.y} cm`;
+
+          trailPoints.push(`${particle.x},${particle.y}`);
+          if (trailPoints.length > 50) trailPoints.shift();
+          trailLine.setAttribute('points', trailPoints.join(' '));
+
+          document.getElementById('valSpeed').textContent = particle.speed.toFixed(1);
+
+          const nearest = findNearestElement({ x: particle.x, y: particle.y });
+          if (nearest.isInsideRadius) {
+            document.getElementById('valTarget').textContent = nearest.target.name;
+            if (!detectedSequence.endsWith(nearest.target.name)) {
+              detectedSequence += nearest.target.name;
+              log(`Resonance token: ${nearest.target.name}`);
+              updateLinguistic();
+            }
+          }
+        }, 20);
+      } else {
+        clearInterval(autonomousTimer);
+        autonomousTimer = null;
+        log('Autonomous particle mode stopped.');
+      }
+    });
+
+    // Shock injection
+    document.getElementById('btnSimulate').addEventListener('click', () => {
+      audioMeter = 88.5;
+      document.getElementById('valNoise').textContent = '88.5 ⚠️';
+      log('⚠️ Injected simulated acoustic shock: 88.5 dB');
+      setTimeout(() => { audioMeter = 35.0; }, 500);
+    });
+
+    // Export CSV
+    document.getElementById('btnExport').addEventListener('click', () => {
+      window.location.href = '/api/export?format=csv';
+    });
+
+    // Export Transitions CSV
+    document.getElementById('btnExportTransitions').addEventListener('click', () => {
+      window.location.href = '/api/export?format=transitions';
+    });
+
+    // Export HTML Visualizer
+    document.getElementById('btnExportHtml').addEventListener('click', () => {
+      window.location.href = '/api/export?format=html';
+    });
+  </script>
+</body>
+</html>
